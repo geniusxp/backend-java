@@ -7,14 +7,13 @@ import br.com.fiap.sprintjava.dtos.user.UserDetailsDTO;
 import br.com.fiap.sprintjava.models.User;
 import br.com.fiap.sprintjava.repositories.UserRepository;
 import br.com.fiap.sprintjava.services.TokenService;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -46,7 +45,15 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserDetailsDTO> createUser(@RequestBody @Valid CreateUserDTO userDTO, UriComponentsBuilder uri){
+    @Transactional
+    public ResponseEntity<UserDetailsDTO> createUser(@RequestBody @Valid CreateUserDTO userDTO, UriComponentsBuilder uri) {
+        System.out.println("USER DTO: " + userDTO);
+        var userAlreadyExists = userRepository.findByEmailOrCpf(userDTO.email(), userDTO.cpf());
+
+        if(userAlreadyExists != null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+
         var user = new User(
                 userDTO.name(),
                 userDTO.email(),
