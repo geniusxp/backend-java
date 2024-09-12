@@ -23,55 +23,37 @@ public class AuthorizationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-//        var tokenJwt = request.getHeader("Authorization");
-//
-//        if (tokenJwt != null) {
-//            tokenJwt = tokenJwt.replace("Bearer ", "");
-//
-//            var subject = tokenService.getSubject(tokenJwt);
-//            var user = userRepository.findByEmail(subject);
-//
-//            var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-//
-//            SecurityContextHolder.getContext().setAuthentication(authentication);
-//        }
-//
-//        filterChain.doFilter(request, response);
-
-
         var tokenJwt = request.getHeader("Authorization");
-        if (tokenJwt == null){
-            filterChain.doFilter(request, response);
-            return;
-        }
 
-        if (!tokenJwt.startsWith("Bearer ")) {
-            response.setStatus(401);
-            response.addHeader("Content-Type", "application/json");
-            response.getWriter().write("""
+        if (tokenJwt != null) {
+            if (!tokenJwt.startsWith("Bearer ")) {
+                response.setStatus(401);
+                response.addHeader("Content-Type", "application/json");
+                response.getWriter().write("""
                         {
                             "message": "Token must starts with Bearer"
                         }
                     """);
-            return;
-        }
+            } else {
+                try {
+                    var subject = tokenService.getSubject(tokenJwt.replace("Bearer ", ""));
+                    var user = userRepository.findByEmail(subject);
 
-        try {
-            var subject = tokenService.getSubject(tokenJwt.replace("Bearer ", ""));
-            var user = userRepository.findByEmail(subject);
+                    var auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(auth);
 
-            var auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(auth);
-
-            filterChain.doFilter(request, response);
-        } catch (Exception e) {
-            response.setStatus(403);
-            response.addHeader("Content-Type", "application/json");
-            response.getWriter().write("""
+                } catch (Exception e) {
+                    response.setStatus(403);
+                    response.addHeader("Content-Type", "application/json");
+                    response.getWriter().write("""
                         {
                             "message": "%s"
                         }
                     """.formatted(e.getMessage()));
+                }
+            }
         }
+
+        filterChain.doFilter(request, response);
     }
 }
