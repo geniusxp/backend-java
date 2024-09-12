@@ -35,6 +35,7 @@ public class SecurityConfig {
                     req.requestMatchers(HttpMethod.POST, "/auth/**").permitAll();
                     req.requestMatchers(ROUTE_ALLOWLIST).permitAll();
                     req.anyRequest().authenticated(); })
+                .cors(AbstractHttpConfigurer::disable)
                 .addFilterBefore(authorizationFilter, UsernamePasswordAuthenticationFilter.class).build();
     }
 
