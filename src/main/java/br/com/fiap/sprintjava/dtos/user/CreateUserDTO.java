@@ -30,7 +30,7 @@ public record CreateUserDTO(
         @Schema(description = "Data de nascimento do usuário.", example = "1999-12-31")
         LocalDate birthDate,
 
-        @Schema(description = "URL da imagem de perfil do usuário.", example = "https://example.com/avatar.jpg")
+        @Schema(description = "URL da imagem de perfil do usuário.", example = "https://api.dicebear.com/9.x/glass/svg?seed=Sasha")
         String avatarUrl,
 
         @Schema(description = "Descrição do usuário.", example = "Estudante de Análise e Desenvolvimento de Sistemas.")

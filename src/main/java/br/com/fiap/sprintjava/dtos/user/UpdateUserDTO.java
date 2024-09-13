@@ -1,23 +1,31 @@
 package br.com.fiap.sprintjava.dtos.user;
 
-import br.com.fiap.sprintjava.models.User;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
-public record UserDetailsDTO(
-        @Schema(description = "ID do usuário.", example = "1")
-        Long id,
-
+public record UpdateUserDTO(
+        @Size(min = 5, max = 150)
         @Schema(description = "Nome do usuário.", example = "Rafael Ronqui")
         String name,
 
+        @Email
+        @Size(min = 5, max = 320)
         @Schema(description = "E-mail do usuário.", example = "rafael.ronqui@fiap.com.br")
         String email,
 
+        @Size(min = 8)
+        @Schema(description = "Senha do usuário.", example = "12345678")
+        String password,
+
+        @Size(min = 11, max = 11)
         @Schema(description = "CPF do usuário.", example = "12345678901")
         String cpf,
 
+        @Past
         @Schema(description = "Data de nascimento do usuário.", example = "1999-12-31")
         LocalDate birthDate,
 
@@ -30,16 +38,5 @@ public record UserDetailsDTO(
         @Schema(description = "Interesses do usuário.", example = "Java, Spring, Docker.")
         String interests
 ) {
-    public UserDetailsDTO(User user){
-        this(
-                user.getId(),
-                user.getName(),
-                user.getEmail(),
-                user.getCpf(),
-                user.getBirthDate(),
-                user.getAvatarUrl(),
-                user.getDescription(),
-                user.getInterests()
-        );
-    }
+
 }
