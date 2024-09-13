@@ -1,6 +1,8 @@
 package br.com.fiap.sprintjava.exceptions;
 
 import br.com.fiap.sprintjava.dtos.errors.ErrorDTO;
+import br.com.fiap.sprintjava.dtos.errors.ErrorDataValidation;
+import br.com.fiap.sprintjava.dtos.errors.ValidationErrorDTO;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +28,8 @@ public class ErrorHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleMethodNotValidError(MethodArgumentNotValidException ex) {
         List<FieldError> errorsList = ex.getFieldErrors();
-        return ResponseEntity.badRequest().body(errorsList.stream().map(ErrorDataValidation::new).toList());
+        ValidationErrorDTO error = new ValidationErrorDTO("Validation Error", errorsList.stream().map(ErrorDataValidation::new).toList(), LocalDateTime.now());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
@@ -50,18 +53,12 @@ public class ErrorHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorDTO> handleAccessDeniedError(AccessDeniedException ex) {
         ErrorDTO error = new ErrorDTO(ex.getClass().getName(), ex.getMessage(), LocalDateTime.now());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDTO> handleInternalServerError(Exception ex) {
         ErrorDTO error = new ErrorDTO(ex.getClass().getName(), ex.getMessage(), LocalDateTime.now());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-    }
-
-    private record ErrorDataValidation(String field, String message){
-        public ErrorDataValidation(FieldError error) {
-            this(error.getField(), error.getDefaultMessage());
-        }
     }
 }
