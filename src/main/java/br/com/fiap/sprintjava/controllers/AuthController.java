@@ -1,5 +1,6 @@
 package br.com.fiap.sprintjava.controllers;
 
+import br.com.fiap.sprintjava.dtos.auth.RecoverPasswordDTO;
 import br.com.fiap.sprintjava.dtos.auth.SignInCredentialsDTO;
 import br.com.fiap.sprintjava.dtos.auth.ResponseTokenDTO;
 import br.com.fiap.sprintjava.dtos.user.CreateUserDTO;
@@ -68,4 +69,15 @@ public class AuthController {
         return ResponseEntity.created(uriBuilder).body(new UserDetailsDTO(user));
     }
 
+    @PostMapping("/recover-password")
+    public ResponseEntity<?> recoverPassword(@RequestBody @Valid RecoverPasswordDTO recoverPasswordDTO) {
+        var user = userRepository.findByEmail(recoverPasswordDTO.email());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        // TODO: Send email with password recovery instructions
+
+        return ResponseEntity.ok().build();
+    }
 }

@@ -4,12 +4,9 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public record SignInCredentialsDTO(
+public record RecoverPasswordDTO(
         @Email
         @NotBlank @Size(min = 5, max = 320)
-        String email,
-
-        @NotBlank @Size(min = 8)
-        String password
+        String email
 ) {
 }
