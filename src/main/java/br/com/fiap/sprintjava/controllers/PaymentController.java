@@ -58,13 +58,16 @@ public class PaymentController {
         val user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         var coupon = couponRepository.findByCode(buyTicketDTO.couponCode()).orElse(null);
-        var ticketType = ticketTypeRepository.findById(buyTicketDTO.ticketType()).orElseThrow();
+        var ticketType = ticketTypeRepository.findById(buyTicketDTO.ticketTypeId()).orElseThrow();
 
-        var payment = new Payment(buyTicketDTO.paymentMethod(), ticketType.getPriceValue());
+        var payment = new Payment(buyTicketDTO.paymentMethod(), ticketType.getPriceValue() - (coupon == null ? 0 : coupon.getDiscountValue()));
         paymentRepository.save(payment);
 
         var ticket = new Ticket(user, ticketType, payment, coupon);
         ticketRepository.save(ticket);
+
+        payment.setTicket(ticket);
+        paymentRepository.save(payment);
 
         var uri = builder.path("/tickets/{id}").buildAndExpand(ticket.getId()).toUri();
         return ResponseEntity.created(uri).body(new TicketDetailsDTO(ticket));
