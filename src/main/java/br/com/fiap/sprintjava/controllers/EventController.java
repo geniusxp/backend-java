@@ -132,7 +132,7 @@ public class EventController {
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado.", content = @Content(schema = @Schema(hidden = true)))
     })
     public ResponseEntity<Object> createEventDay() {
-        // TODO: criar dia de evento
+
         return ResponseEntity.ok().build();
     }
 }

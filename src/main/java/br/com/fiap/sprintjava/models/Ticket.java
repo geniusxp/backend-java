@@ -1,6 +1,7 @@
 package br.com.fiap.sprintjava.models;
 
 import br.com.fiap.sprintjava.dtos.payment.BuyTicketDTO;
+import br.com.fiap.sprintjava.dtos.ticket.UpdateTicketDTO;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -51,6 +52,14 @@ public class Ticket {
         this.ticketType = ticketType;
         this.payment = payment;
         this.coupon = coupon;
+    }
 
+    public void atualizar(UpdateTicketDTO dto){
+        if(dto.dateOfUse() != null)
+            this.dateOfUse = LocalDateTime.now();
+        if(dto.issuedDate() != null)
+            this.issuedDate = LocalDateTime.now();
+        if(dto.ticketNumber() != null)
+            this.ticketNumber = dto.ticketNumber();
     }
 }
