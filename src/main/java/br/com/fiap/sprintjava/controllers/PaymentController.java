@@ -66,9 +66,6 @@ public class PaymentController {
         var ticket = new Ticket(user, ticketType, payment, coupon);
         ticketRepository.save(ticket);
 
-        payment.setTicket(ticket);
-        paymentRepository.save(payment);
-
         var uri = builder.path("/tickets/{id}").buildAndExpand(ticket.getId()).toUri();
         return ResponseEntity.created(uri).body(new TicketDetailsDTO(ticket));
     }

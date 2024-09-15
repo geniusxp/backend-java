@@ -14,7 +14,6 @@ public record BuyTicketDTO(
         @Schema(description = "Método de pagamento", example = "CREDIT_CARD")
         PaymentMethod paymentMethod,
 
-        @NotBlank
         @Schema(description = "Código do cupom", example = "FIAP10")
         String couponCode
 ) {
