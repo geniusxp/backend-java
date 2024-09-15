@@ -60,10 +60,7 @@ public class PaymentController {
         var coupon = couponRepository.findByCode(buyTicketDTO.couponCode()).orElse(null);
         var ticketType = ticketTypeRepository.findById(buyTicketDTO.ticketTypeId()).orElseThrow();
 
-        var payment = new Payment(buyTicketDTO.paymentMethod(), ticketType.getPriceValue() - (coupon == null ? 0 : coupon.getDiscountValue()));
-        paymentRepository.save(payment);
-
-        var ticket = new Ticket(user, ticketType, payment, coupon);
+        var ticket = new Ticket(buyTicketDTO, user, ticketType, coupon);
         ticketRepository.save(ticket);
 
         var uri = builder.path("/tickets/{id}").buildAndExpand(ticket.getId()).toUri();

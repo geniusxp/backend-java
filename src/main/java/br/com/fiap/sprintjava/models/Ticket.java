@@ -1,5 +1,6 @@
 package br.com.fiap.sprintjava.models;
 
+import br.com.fiap.sprintjava.dtos.payment.BuyTicketDTO;
 import br.com.fiap.sprintjava.dtos.ticket.UpdateTicketDTO;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -35,21 +36,21 @@ public class Ticket {
     @JoinColumn(name = "id_ticket_type")
     private TicketType ticketType;
 
-    @OneToOne
-    @JoinColumn(name = "id_payment")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "ticket", orphanRemoval = true)
     private Payment payment;
 
     @ManyToOne
     @JoinColumn(name = "id_coupon")
     private Coupon coupon = null;
 
-    public Ticket(User user, TicketType ticketType, Payment payment, Coupon coupon) {
+    public Ticket(BuyTicketDTO ticketDTO, User user, TicketType ticketType, Coupon coupon) {
         this.issuedDate = LocalDateTime.now();
         this.ticketNumber = Instant.now().getEpochSecond() + "@" + user.getId();
         this.user = user;
         this.ticketType = ticketType;
-        this.payment = payment;
         this.coupon = coupon;
+        this.payment = new Payment(ticketDTO.paymentMethod(), ticketType.getPriceValue() - (coupon == null ? 0 : coupon.getDiscountValue()));
+        this.payment.setTicket(this);
     }
 
     public void atualizar(UpdateTicketDTO dto){

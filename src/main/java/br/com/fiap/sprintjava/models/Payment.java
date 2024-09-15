@@ -19,9 +19,11 @@ public class Payment {
     private Long id;
 
     @Column(name="ds_payment_method")
+    @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
 
     @Column(name="st_payment")
+    @Enumerated(EnumType.STRING)
     private PaymentStatus status = PaymentStatus.PENDING;
 
     @Column(name="vl_total_price")
@@ -34,7 +36,7 @@ public class Payment {
     private LocalDateTime paymentDate = null;
 
     @OneToOne
-    @JoinColumn(name = "id_ticket")
+    @JoinColumn(name = "id_ticket", nullable = false)
     private Ticket ticket;
 
     public Payment(PaymentMethod paymentMethod, double totalPrice) {
