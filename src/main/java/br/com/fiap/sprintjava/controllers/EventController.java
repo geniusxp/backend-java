@@ -3,10 +3,13 @@ package br.com.fiap.sprintjava.controllers;
 import br.com.fiap.sprintjava.dtos.event.CreateEventDTO;
 import br.com.fiap.sprintjava.dtos.event.EventDetailsDTO;
 import br.com.fiap.sprintjava.dtos.event.UpdateEventDTO;
+import br.com.fiap.sprintjava.dtos.eventday.CreateEventDayDTO;
 import br.com.fiap.sprintjava.dtos.tickettype.CreateTicketTypeDTO;
 import br.com.fiap.sprintjava.dtos.tickettype.TicketTypeDetailsDTO;
 import br.com.fiap.sprintjava.models.Event;
+import br.com.fiap.sprintjava.models.EventDay;
 import br.com.fiap.sprintjava.models.TicketType;
+import br.com.fiap.sprintjava.repositories.EventDayRepository;
 import br.com.fiap.sprintjava.repositories.EventRepository;
 import br.com.fiap.sprintjava.dtos.errors.ValidationErrorDTO;
 import br.com.fiap.sprintjava.repositories.TicketTypeRepository;
@@ -33,6 +36,9 @@ public class EventController {
 
     @Autowired
     private EventRepository eventRepository;
+
+    @Autowired
+    private EventDayRepository eventDayRepository;
 
     @Autowired
     private TicketTypeRepository ticketTypeRepository;
@@ -123,16 +129,25 @@ public class EventController {
         return ResponseEntity.created(url).body(new TicketTypeDetailsDTO(newTicketType));
     }
 
-    @PostMapping("/days")
+    @PostMapping("/{id}/days")
     @Transactional
     @Operation(summary = "Criar um dia de evento", description = "Cria um novo dia de evento.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Dia de evento criado com sucesso.", content = @Content(schema = @Schema(implementation = Object.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "200", description = "Dia de evento criado com sucesso.", content = @Content(schema = @Schema(implementation = EventDay.class), mediaType = "application/json")),
             @ApiResponse(responseCode = "400", description = "Dados inválidos.", content = @Content(schema = @Schema(implementation = ValidationErrorDTO.class), mediaType = "application/json")),
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado.", content = @Content(schema = @Schema(hidden = true)))
     })
-    public ResponseEntity<Object> createEventDay() {
+    public ResponseEntity<EventDay> createEventDay(
+            @PathVariable("id") Long eventId,
+            @RequestBody @Valid CreateEventDayDTO eventDayDTO,
+            UriComponentsBuilder builder
+    ) {
+        var event = eventRepository.getReferenceById(eventId);
+        var newEventDay = new EventDay(eventDayDTO, event);
 
-        return ResponseEntity.ok().build();
+        eventDayRepository.save(newEventDay);
+
+        var url = builder.path("events/days/{id}").buildAndExpand(newEventDay.getId()).toUri();
+        return ResponseEntity.created(url).body(newEventDay);
     }
 }

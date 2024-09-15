@@ -1,6 +1,7 @@
 package br.com.fiap.sprintjava.models;
 
 
+import br.com.fiap.sprintjava.dtos.eventday.CreateEventDayDTO;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,4 +30,11 @@ public class EventDay {
     @ManyToOne
     @JoinColumn(name = "id_event")
     private Event event;
+
+    public EventDay(CreateEventDayDTO eventDayDTO, Event evt) {
+        this.startDate = eventDayDTO.startDate();
+        this.endDate = eventDayDTO.endDate();
+        this.transmissionUrl = eventDayDTO.transmissionUrl();
+        this.event = evt;
+    }
 }
