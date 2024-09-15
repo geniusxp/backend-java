@@ -6,5 +6,5 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LectureRepository extends JpaRepository<Lecture, Long> {
-    Page<Lecture> findByEvent(Long eventId, Pageable pageable);
+    Page<Lecture> findByEventDay(Long eventDay, Pageable pageable);
 }

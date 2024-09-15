@@ -6,10 +6,8 @@ import jakarta.validation.constraints.NotBlank;
 
 
 public record BuyTicketDTO(
-        @NotBlank
         Long ticketType,
 
-        @NotBlank
         PaymentMethod paymentMethod,
 
         String couponCode

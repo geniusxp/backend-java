@@ -33,6 +33,9 @@ public class Event {
     @OneToMany(mappedBy = "event")
     private List<Coupon> coupons;
 
+    @OneToMany(mappedBy = "event")
+    private List<TicketType> ticketTypes;
+
     public Event(CreateEventDTO dto){
         name = dto.name();
         description = dto.description();

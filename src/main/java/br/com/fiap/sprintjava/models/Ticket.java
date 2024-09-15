@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -43,9 +44,9 @@ public class Ticket {
     @JoinColumn(name = "id_coupon")
     private Coupon coupon = null;
 
-    public Ticket(BuyTicketDTO ticketDTO, User user, TicketType ticketType, Payment payment, Coupon coupon) {
+    public Ticket(User user, TicketType ticketType, Payment payment, Coupon coupon) {
         this.issuedDate = LocalDateTime.now();
-        this.ticketNumber = "TICKET-" + LocalDateTime.now().toString() + "-" + user.getId();
+        this.ticketNumber = Instant.now().getEpochSecond() + "@" + user.getId();
         this.user = user;
         this.ticketType = ticketType;
         this.payment = payment;

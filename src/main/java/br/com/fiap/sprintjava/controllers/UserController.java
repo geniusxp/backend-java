@@ -1,7 +1,5 @@
 package br.com.fiap.sprintjava.controllers;
 
-import br.com.fiap.sprintjava.dtos.auth.RecoverPasswordDTO;
-import br.com.fiap.sprintjava.dtos.auth.ResponseTokenDTO;
 import br.com.fiap.sprintjava.dtos.errors.ValidationErrorDTO;
 import br.com.fiap.sprintjava.dtos.user.UpdateUserDTO;
 import br.com.fiap.sprintjava.dtos.user.UserDetailsDTO;
