@@ -1,5 +1,7 @@
 package br.com.fiap.sprintjava.models;
 
+import br.com.fiap.sprintjava.dtos.event.CreateEventDTO;
+import br.com.fiap.sprintjava.dtos.event.UpdateEventDTO;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,4 +27,22 @@ public class Event {
 
     @Column(name="url_image")
     private String imageUrl;
+
+    public Event(CreateEventDTO dto){
+        name = dto.name();
+        description = dto.description();
+        eventType = dto.eventType();
+        imageUrl = dto.imageUrl();
+    }
+
+    public void atualizar(UpdateEventDTO dto){
+        if(dto.name() != null)
+            this.name = dto.name();
+        if(dto.description() != null)
+            this.description = dto.description();
+        if(dto.eventType() != null)
+            this.eventType = dto.eventType();
+        if(dto.imageUrl() != null)
+            this.imageUrl = dto.imageUrl();
+    }
 }

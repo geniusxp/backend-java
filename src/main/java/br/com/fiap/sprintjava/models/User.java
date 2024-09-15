@@ -1,5 +1,6 @@
 package br.com.fiap.sprintjava.models;
 
+import br.com.fiap.sprintjava.dtos.user.UpdateUserDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -56,6 +57,17 @@ public class User implements UserDetails {
         this.avatarUrl = avatarUrl;
         this.description = description;
         this.interests = interests;
+    }
+
+    public void update(UpdateUserDTO userDTO){
+        if(userDTO.name() != null) this.name = userDTO.name();
+        if(userDTO.email() != null) this.email = userDTO.email();
+        if(userDTO.password() != null) this.password = userDTO.password();
+        if(userDTO.cpf() != null) this.cpf = userDTO.cpf();
+        if(userDTO.birthDate() != null) this.birthDate = userDTO.birthDate();
+        if(userDTO.avatarUrl() != null) this.avatarUrl = userDTO.avatarUrl();
+        if(userDTO.description() != null) this.description = userDTO.description();
+        if(userDTO.interests() != null) this.interests = userDTO.interests();
     }
 
     @Override
