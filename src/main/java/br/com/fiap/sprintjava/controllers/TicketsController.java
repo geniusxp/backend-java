@@ -26,8 +26,8 @@ public class TicketsController {
     @Autowired
     private TicketRepository ticketRepository;
 
-    @GetMapping
-    @Operation(summary = "Obter todos os ingressos", description = "Obtém todos os ingressos do usuário logado.")
+    @GetMapping("/me")
+    @Operation(summary = "Obter meus ingressos", description = "Obtém todos os ingressos do usuário logado.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Ingressos obtidos com sucesso.", content = @Content(schema = @Schema(implementation = Object.class), mediaType = "application/json")),
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado.", content = @Content(schema = @Schema(hidden = true)))

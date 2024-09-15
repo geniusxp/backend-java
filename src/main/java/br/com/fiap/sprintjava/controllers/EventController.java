@@ -58,7 +58,7 @@ public class EventController {
     @Transactional
     @Operation(summary = "Criar um evento", description = "Cria um novo evento.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Evento criado com sucesso.", content = @Content(schema = @Schema(implementation = EventDetailsDTO.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "201", description = "Evento criado com sucesso.", content = @Content(schema = @Schema(implementation = EventDetailsDTO.class), mediaType = "application/json")),
             @ApiResponse(responseCode = "400", description = "Dados inválidos.", content = @Content(schema = @Schema(implementation = ValidationErrorDTO.class), mediaType = "application/json")),
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado.", content = @Content(schema = @Schema(hidden = true)))
     })
@@ -111,7 +111,7 @@ public class EventController {
     @Transactional
     @Operation(summary = "Criar um tipo de ingresso", description = "Cria um novo tipo de ingresso.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Tipo de ingresso criado com sucesso.", content = @Content(schema = @Schema(implementation = TicketType.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "201", description = "Tipo de ingresso criado com sucesso.", content = @Content(schema = @Schema(implementation = TicketType.class), mediaType = "application/json")),
             @ApiResponse(responseCode = "400", description = "Dados inválidos.", content = @Content(schema = @Schema(implementation = ValidationErrorDTO.class), mediaType = "application/json")),
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado.", content = @Content(schema = @Schema(hidden = true)))
     })
@@ -133,7 +133,7 @@ public class EventController {
     @Transactional
     @Operation(summary = "Criar um dia de evento", description = "Cria um novo dia de evento.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Dia de evento criado com sucesso.", content = @Content(schema = @Schema(implementation = EventDay.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "201", description = "Dia de evento criado com sucesso.", content = @Content(schema = @Schema(implementation = EventDay.class), mediaType = "application/json")),
             @ApiResponse(responseCode = "400", description = "Dados inválidos.", content = @Content(schema = @Schema(implementation = ValidationErrorDTO.class), mediaType = "application/json")),
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado.", content = @Content(schema = @Schema(hidden = true)))
     })
