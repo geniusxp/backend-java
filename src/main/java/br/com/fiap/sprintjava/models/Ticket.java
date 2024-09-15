@@ -1,6 +1,5 @@
 package br.com.fiap.sprintjava.models;
 
-import br.com.fiap.sprintjava.dtos.payment.BuyTicketDTO;
 import br.com.fiap.sprintjava.dtos.ticket.UpdateTicketDTO;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -8,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Entity
 @Table(name = "T_GXP_TICKET")
