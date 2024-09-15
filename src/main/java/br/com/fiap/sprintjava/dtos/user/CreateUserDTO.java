@@ -33,9 +33,11 @@ public record CreateUserDTO(
         @Schema(description = "URL da imagem de perfil do usuário.", example = "https://api.dicebear.com/9.x/glass/svg?seed=Sasha")
         String avatarUrl,
 
+        @Size(max = 255)
         @Schema(description = "Descrição do usuário.", example = "Estudante de Análise e Desenvolvimento de Sistemas.")
         String description,
 
+        @Size(max = 255)
         @Schema(description = "Interesses do usuário.", example = "Java, Spring, Docker.")
         String interests
 ) {

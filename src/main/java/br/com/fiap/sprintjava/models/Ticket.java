@@ -1,10 +1,12 @@
 package br.com.fiap.sprintjava.models;
 
+import br.com.fiap.sprintjava.dtos.payment.BuyTicketDTO;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Entity
 @Table(name = "T_GXP_TICKET")
@@ -17,7 +19,7 @@ public class Ticket {
     private Long id;
 
     @Column(name="dt_of_use")
-    private LocalDateTime dateOfUse;
+    private LocalDateTime dateOfUse = null;
 
     @Column(name="dt_issued")
     private LocalDateTime issuedDate;
@@ -39,5 +41,15 @@ public class Ticket {
 
     @ManyToOne
     @JoinColumn(name = "id_coupon")
-    private Coupon coupon;
+    private Coupon coupon = null;
+
+    public Ticket(BuyTicketDTO ticketDTO, User user, TicketType ticketType, Payment payment, Coupon coupon) {
+        this.issuedDate = LocalDateTime.now();
+        this.ticketNumber = "TICKET-" + LocalDateTime.now().toString() + "-" + user.getId();
+        this.user = user;
+        this.ticketType = ticketType;
+        this.payment = payment;
+        this.coupon = coupon;
+
+    }
 }

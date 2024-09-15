@@ -1,5 +1,6 @@
 package br.com.fiap.sprintjava.models;
 
+import br.com.fiap.sprintjava.dtos.coupon.CreateCouponDTO;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,4 +26,16 @@ public class Coupon {
 
     @Column(name="vl_discount")
     private double discountValue;
+
+    @ManyToOne
+    @JoinColumn(name = "id_event")
+    private Event event;
+
+    public Coupon(CreateCouponDTO createCouponDTO, Event event) {
+        this.name = createCouponDTO.name();
+        this.description = createCouponDTO.description();
+        this.code = createCouponDTO.code();
+        this.discountValue = createCouponDTO.discountValue();
+        this.event = event;
+    }
 }

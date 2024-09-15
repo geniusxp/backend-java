@@ -1,5 +1,7 @@
 package br.com.fiap.sprintjava.models;
 
+import br.com.fiap.sprintjava.enums.PaymentMethod;
+import br.com.fiap.sprintjava.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,21 +19,26 @@ public class Payment {
     private Long id;
 
     @Column(name="ds_payment_method")
-    private String paymentMethod;
+    private PaymentMethod paymentMethod;
 
     @Column(name="st_payment")
-    private String status;
+    private PaymentStatus status = PaymentStatus.PENDING;
 
     @Column(name="vl_total_price")
     private double totalPrice;
 
     @Column(name="dt_due")
-    private LocalDateTime dueDate;
+    private LocalDateTime dueDate = LocalDateTime.now().plusDays(3);
 
     @Column(name="dt_payment")
-    private LocalDateTime paymentDate;
+    private LocalDateTime paymentDate = null;
 
     @OneToOne
     @JoinColumn(name = "id_ticket")
     private Ticket ticket;
+
+    public Payment(PaymentMethod paymentMethod, double totalPrice) {
+        this.paymentMethod = paymentMethod;
+        this.totalPrice = totalPrice;
+    }
 }

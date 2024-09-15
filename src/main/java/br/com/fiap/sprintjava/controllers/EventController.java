@@ -73,4 +73,10 @@ public class EventController {
         // TODO: criar tipo de ingresso
         return ResponseEntity.ok().build();
     }
+    
+    @PostMapping("/days")
+    public ResponseEntity<Object> createEventDay() {
+        // TODO: criar dia de evento
+        return ResponseEntity.ok().build();
+    }
 }

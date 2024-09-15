@@ -19,8 +19,11 @@ public class Poll {
     @Column(name="nm_poll")
     String name;
 
-    @Column(name="dt_created_at")
-    LocalDateTime createdAt;
+    @Column(name="dt_start_at")
+    LocalDateTime startDate = LocalDateTime.now();
+
+    @Column(name="dt_end_at")
+    LocalDateTime endDate = LocalDateTime.now().plusMinutes(15);
 
     @ManyToOne
     @JoinColumn(name = "T_GXP_EVENT")

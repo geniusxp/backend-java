@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Table(name = "T_GXP_EVENT")
 @Data
@@ -27,6 +29,9 @@ public class Event {
 
     @Column(name="url_image")
     private String imageUrl;
+
+    @OneToMany(mappedBy = "event")
+    private List<Coupon> coupons;
 
     public Event(CreateEventDTO dto){
         name = dto.name();
