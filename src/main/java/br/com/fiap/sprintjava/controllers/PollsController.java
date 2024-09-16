@@ -1,5 +1,6 @@
 package br.com.fiap.sprintjava.controllers;
 
+import br.com.fiap.sprintjava.dtos.errors.ErrorDTO;
 import br.com.fiap.sprintjava.dtos.errors.ValidationErrorDTO;
 import br.com.fiap.sprintjava.models.Lecture;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,10 +19,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/events/:id/polls")
+@RequestMapping("/events/{id}/polls")
 @Tag(name = "Enquetes", description = "Operações relacionadas às enquetes do evento.")
 public class PollsController {
     @Autowired
@@ -47,27 +49,35 @@ public class PollsController {
     @Operation(summary = "Obter enquete atual", description = "Obtém a enquete atual do evento pelo id.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Enquete atual obtida com sucesso.", content = @Content(schema = @Schema(implementation = Poll.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "204", description = "Nenhuma enquete acontecendo no momento.", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado.", content = @Content(schema = @Schema(hidden = true)))
     })
     public ResponseEntity<Poll> getNowPoll(
             @PathVariable("id") Long eventId
     ) {
         var poll = pollRepository.findNowPoll(eventId);
+        if(poll == null) {
+            return ResponseEntity.noContent().build();
+        }
 
         return ResponseEntity.ok(poll);
     }
 
-    @PostMapping("/:option_id/vote")
+    @PutMapping("/{option_id}/vote")
     @Operation(summary = "Votar na enquete", description = "Vota na enquete pelo id da opção.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Voto computado com sucesso.", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "400", description = "Dados inválidos.", content = @Content(schema = @Schema(implementation = ValidationErrorDTO.class), mediaType = "application/json")),
-            @ApiResponse(responseCode = "401", description = "Usuário não autenticado.", content = @Content(schema = @Schema(hidden = true)))
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado.", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "404", description = "Opção da enquete não encontrada.", content = @Content(schema = @Schema(implementation = ErrorDTO.class), mediaType = "application/json"))
     })
-    public ResponseEntity<Void> votePoll(
+    public ResponseEntity<Object> votePoll(
             @PathVariable("option_id") Long pollOptionId
     ) {
-        var pollOption = pollOptionRepository.findById(pollOptionId).orElseThrow();
+        var pollOption = pollOptionRepository.findById(pollOptionId).orElse(null);
+        if(pollOption == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDTO("Bad Request", "Opção da enquete não encontrada.", LocalDateTime.now()));
+        }
 
         pollOption.setVotesAmount(pollOption.getVotesAmount() + 1);
         pollOptionRepository.save(pollOption);
@@ -75,16 +85,21 @@ public class PollsController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @GetMapping("/:id/results")
+    @GetMapping("/{poll_id}/results")
     @Operation(summary = "Obter resultado da enquete", description = "Obtém o resultado da enquete pelo id.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Resultado da enquete obtido com sucesso.", content = @Content(schema = @Schema(implementation = Poll.class), mediaType = "application/json")),
-            @ApiResponse(responseCode = "401", description = "Usuário não autenticado.", content = @Content(schema = @Schema(hidden = true)))
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado.", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "404", description = "Enquete não encontrada.", content = @Content(schema = @Schema(implementation = ErrorDTO.class), mediaType = "application/json"))
     })
-    public ResponseEntity<Poll> getPoll(
-            @PathVariable("id") Long pollId
+    public ResponseEntity<Object> getPoll(
+            @PathVariable("poll_id") Long pollId
     ) {
-        var poll = pollRepository.findById(pollId).orElseThrow();
+        var poll = pollRepository.findById(pollId).orElse(null);
+        if(poll == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDTO("Not Found", "Enquete não encontrada.", LocalDateTime.now()));
+        }
+
         return ResponseEntity.ok(poll);
     }
 }

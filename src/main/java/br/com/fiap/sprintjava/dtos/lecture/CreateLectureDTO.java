@@ -22,10 +22,6 @@ public record CreateLectureDTO(
         LocalDateTime date,
 
         @NotNull
-        @Schema(description = "Id do dia do evento", example = "1")
-        Long eventDayId,
-
-        @NotNull
         @Schema(description = "Id do palestrante", example = "1")
         Long speakerId
 ) {

@@ -53,12 +53,8 @@ public class Ticket {
         this.payment.setTicket(this);
     }
 
-    public void atualizar(UpdateTicketDTO dto){
+    public void update(UpdateTicketDTO dto){
         if(dto.dateOfUse() != null)
             this.dateOfUse = LocalDateTime.now();
-        if(dto.issuedDate() != null)
-            this.issuedDate = LocalDateTime.now();
-        if(dto.ticketNumber() != null)
-            this.ticketNumber = dto.ticketNumber();
     }
 }

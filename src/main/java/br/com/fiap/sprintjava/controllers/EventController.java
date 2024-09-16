@@ -4,6 +4,7 @@ import br.com.fiap.sprintjava.dtos.event.CreateEventDTO;
 import br.com.fiap.sprintjava.dtos.event.EventDetailsDTO;
 import br.com.fiap.sprintjava.dtos.event.UpdateEventDTO;
 import br.com.fiap.sprintjava.dtos.eventday.CreateEventDayDTO;
+import br.com.fiap.sprintjava.dtos.eventday.EventDayDetailsDTO;
 import br.com.fiap.sprintjava.dtos.tickettype.CreateTicketTypeDTO;
 import br.com.fiap.sprintjava.dtos.tickettype.TicketTypeDetailsDTO;
 import br.com.fiap.sprintjava.models.Event;
@@ -37,8 +38,6 @@ public class EventController {
     @Autowired
     private EventRepository eventRepository;
 
-    @Autowired
-    private EventDayRepository eventDayRepository;
 
     @Autowired
     private TicketTypeRepository ticketTypeRepository;
@@ -66,22 +65,22 @@ public class EventController {
                                                        UriComponentsBuilder builder) {
         var event = new Event(dto);
         eventRepository.save(event);
-        var url = builder.path("events/{id}").buildAndExpand(event.getId()).toUri();
+        var url = builder.path("events/{event_id}").buildAndExpand(event.getId()).toUri();
         return ResponseEntity.created(url).body(new EventDetailsDTO(event));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{event_id}")
     @Operation(summary = "Obter um evento", description = "Obtém um evento pelo id.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Evento obtido com sucesso.", content = @Content(schema = @Schema(implementation = EventDetailsDTO.class), mediaType = "application/json")),
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado.", content = @Content(schema = @Schema(hidden = true)))
     })
-    public ResponseEntity<EventDetailsDTO> getEvent(@PathVariable("id") Long id) {
+    public ResponseEntity<EventDetailsDTO> getEvent(@PathVariable("event_id") Long id) {
         var event = eventRepository.getReferenceById(id);
         return ResponseEntity.ok(new EventDetailsDTO(event));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{event_id}")
     @Transactional
     @Operation(summary = "Atualizar um evento", description = "Atualiza um evento pelo id.")
     @ApiResponses({
@@ -89,25 +88,25 @@ public class EventController {
             @ApiResponse(responseCode = "400", description = "Dados inválidos.", content = @Content(schema = @Schema(implementation = ValidationErrorDTO.class), mediaType = "application/json")),
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado.", content = @Content(schema = @Schema(hidden = true)))
     })
-    public ResponseEntity<EventDetailsDTO> updateEvent(@PathVariable("id") Long id, @RequestBody @Valid UpdateEventDTO dto) {
+    public ResponseEntity<EventDetailsDTO> updateEvent(@PathVariable("event_id") Long id, @RequestBody @Valid UpdateEventDTO dto) {
         var event = eventRepository.getReferenceById(id);
         event.atualizar(dto);
         return ResponseEntity.ok(new EventDetailsDTO(event));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{event_id}")
     @Transactional
     @Operation(summary = "Deletar um evento", description = "Deleta um evento pelo id.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Evento deletado com sucesso.", content = @Content(schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado.", content = @Content(schema = @Schema(hidden = true)))
     })
-    public ResponseEntity<Void> deleteEvent(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> deleteEvent(@PathVariable("event_id") Long id) {
         eventRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{id}/tickets-type")
+    @PostMapping("/{event_id}/tickets-type")
     @Transactional
     @Operation(summary = "Criar um tipo de ingresso", description = "Cria um novo tipo de ingresso.")
     @ApiResponses({
@@ -116,7 +115,7 @@ public class EventController {
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado.", content = @Content(schema = @Schema(hidden = true)))
     })
     public ResponseEntity<TicketTypeDetailsDTO> createTicketType(
-            @PathVariable("id") Long eventId,
+            @PathVariable("event_id") Long eventId,
             @RequestBody @Valid CreateTicketTypeDTO ticketType,
             UriComponentsBuilder builder
     ) {
@@ -129,25 +128,4 @@ public class EventController {
         return ResponseEntity.created(url).body(new TicketTypeDetailsDTO(newTicketType));
     }
 
-    @PostMapping("/{id}/days")
-    @Transactional
-    @Operation(summary = "Criar um dia de evento", description = "Cria um novo dia de evento.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Dia de evento criado com sucesso.", content = @Content(schema = @Schema(implementation = EventDay.class), mediaType = "application/json")),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos.", content = @Content(schema = @Schema(implementation = ValidationErrorDTO.class), mediaType = "application/json")),
-            @ApiResponse(responseCode = "401", description = "Usuário não autenticado.", content = @Content(schema = @Schema(hidden = true)))
-    })
-    public ResponseEntity<EventDay> createEventDay(
-            @PathVariable("id") Long eventId,
-            @RequestBody @Valid CreateEventDayDTO eventDayDTO,
-            UriComponentsBuilder builder
-    ) {
-        var event = eventRepository.getReferenceById(eventId);
-        var newEventDay = new EventDay(eventDayDTO, event);
-
-        eventDayRepository.save(newEventDay);
-
-        var url = builder.path("events/days/{id}").buildAndExpand(newEventDay.getId()).toUri();
-        return ResponseEntity.created(url).body(newEventDay);
-    }
 }

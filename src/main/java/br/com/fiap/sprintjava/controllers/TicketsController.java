@@ -48,7 +48,7 @@ public class TicketsController {
     public ResponseEntity<TicketDetailsDTO> scanTicket(@PathVariable("id") Long id,
                                                        @RequestBody @Valid UpdateTicketDTO dto) {
         var ticket = ticketRepository.getReferenceById(id);
-        ticket.atualizar(dto);
+        ticket.update(dto);
         return ResponseEntity.ok(new TicketDetailsDTO(ticket));
     }
 

@@ -1,6 +1,8 @@
 package br.com.fiap.sprintjava.controllers;
 
+import br.com.fiap.sprintjava.dtos.errors.ErrorDTO;
 import br.com.fiap.sprintjava.dtos.errors.ValidationErrorDTO;
+import br.com.fiap.sprintjava.dtos.speaker.SpeakerDetailsDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,14 +17,16 @@ import br.com.fiap.sprintjava.repositories.SpeakerRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @RestController
-@RequestMapping("events/:id/speakers")
+@RequestMapping("events/{event_id}/speakers")
 @Tag(name = "Palestrantes", description = "Operações relacionadas aos palestrantes do evento.")
 public class SpeakersController {
     @Autowired
@@ -37,28 +41,32 @@ public class SpeakersController {
             @ApiResponse(responseCode = "200", description = "Palestrantes obtidos com sucesso.", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado.", content = @Content(schema = @Schema(hidden = true)))
     })
-    public ResponseEntity<Page<Speaker>> getSpeakers(
-            @PathVariable("id") Long eventId,
-            Pageable pageable
+    public ResponseEntity<List<SpeakerDetailsDTO>> getSpeakers(
+            @PathVariable("event_id") Long eventId
     ) {
-        var speakers = speakerRepository.findByEvent(eventId, pageable);
-        return ResponseEntity.ok(speakers);
+        var speakers = speakerRepository.findByEventId(eventId);
+        return ResponseEntity.ok(speakers.stream().map(SpeakerDetailsDTO::new).toList());
     }
 
     @PostMapping
     @Transactional
     @Operation(summary = "Criar um palestrante", description = "Cria um novo palestrante para o evento pelo id.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Palestrante criado com sucesso.", content = @Content(schema = @Schema(implementation = Object.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "201", description = "Palestrante criado com sucesso.", content = @Content(schema = @Schema(implementation = SpeakerDetailsDTO.class), mediaType = "application/json")),
             @ApiResponse(responseCode = "400", description = "Dados inválidos.", content = @Content(schema = @Schema(implementation = ValidationErrorDTO.class), mediaType = "application/json")),
-            @ApiResponse(responseCode = "401", description = "Usuário não autenticado.", content = @Content(schema = @Schema(hidden = true)))
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado.", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "404", description = "Evento não encontrado.", content = @Content(schema = @Schema(implementation = ErrorDTO.class), mediaType = "application/json"))
     })
-    public ResponseEntity<Speaker> createSpeaker(
-            @PathVariable("id") Long eventId,
+    public ResponseEntity<Object> createSpeaker(
+            @PathVariable("event_id") Long eventId,
             @RequestBody @Valid CreateSpeakerDTO speakerDTO,
             UriComponentsBuilder builder
     ) {
-        var event = eventRepository.findById(eventId).orElseThrow();
+        var event = eventRepository.findById(eventId).orElse(null);
+        if(event == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDTO("Bad Request", "Evento não encontrado.", LocalDateTime.now()));
+        }
+
         var speaker = new Speaker(
                 speakerDTO.name(),
                 speakerDTO.description(),
@@ -71,52 +79,67 @@ public class SpeakersController {
         speakerRepository.save(speaker);
 
         var uri = builder.path("/speakers/{id}").buildAndExpand(speaker.getId()).toUri();
-        return ResponseEntity.created(uri).body(speaker);
+        return ResponseEntity.created(uri).body(new SpeakerDetailsDTO(speaker));
     }
 
-    @GetMapping("/:id")
+    @GetMapping("/{speaker_id}")
     @Operation(summary = "Obter um palestrante", description = "Obtém um palestrante pelo id.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Palestrante obtido com sucesso.", content = @Content(schema = @Schema(implementation = Object.class), mediaType = "application/json")),
-            @ApiResponse(responseCode = "401", description = "Usuário não autenticado.", content = @Content(schema = @Schema(hidden = true)))
+            @ApiResponse(responseCode = "200", description = "Palestrante obtido com sucesso.", content = @Content(schema = @Schema(implementation = SpeakerDetailsDTO.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado.", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "404", description = "Palestrante não encontrado.", content = @Content(schema = @Schema(implementation = ErrorDTO.class), mediaType = "application/json"))
     })
-    public ResponseEntity<Speaker> getSpeaker(
-            @PathVariable("id") Long speakerId
+    public ResponseEntity<Object> getSpeaker(
+            @PathVariable("speaker_id") Long speakerId
     ) {
-        var speaker = speakerRepository.findById(speakerId).orElseThrow();
-        return ResponseEntity.ok(speaker);
+        var speaker = speakerRepository.findById(speakerId).orElse(null);
+        if(speaker == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDTO("Bad Request", "Palestrante não encontrado.", LocalDateTime.now()));
+        }
+
+        return ResponseEntity.ok(new SpeakerDetailsDTO(speaker));
     }
 
-    @PutMapping("/:id")
+    @PutMapping("/{speaker_id}")
     @Transactional
     @Operation(summary = "Atualizar um palestrante", description = "Atualiza um palestrante pelo id.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Palestrante atualizado com sucesso.", content = @Content(schema = @Schema(implementation = Object.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "200", description = "Palestrante atualizado com sucesso.", content = @Content(schema = @Schema(implementation = SpeakerDetailsDTO.class), mediaType = "application/json")),
             @ApiResponse(responseCode = "400", description = "Dados inválidos.", content = @Content(schema = @Schema(implementation = ValidationErrorDTO.class), mediaType = "application/json")),
-            @ApiResponse(responseCode = "401", description = "Usuário não autenticado.", content = @Content(schema = @Schema(hidden = true)))
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado.", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "404", description = "Palestrante não encontrado.", content = @Content(schema = @Schema(implementation = ErrorDTO.class), mediaType = "application/json"))
     })
-    public ResponseEntity<Speaker> updateSpeaker(
-            @PathVariable("id") Long speakerId,
+    public ResponseEntity<Object> updateSpeaker(
+            @PathVariable("speaker_id") Long speakerId,
             @RequestBody @Valid UpdateSpeakerDTO speakerDTO
     ) {
-        var speaker = speakerRepository.findById(speakerId).orElseThrow();
+        var speaker = speakerRepository.findById(speakerId).orElse(null);
+        if(speaker == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDTO("Bad Request", "Palestrante não encontrado.", LocalDateTime.now()));
+        }
+
         speaker.update(speakerDTO);
 
         speakerRepository.save(speaker);
-        return ResponseEntity.ok(speaker);
+        return ResponseEntity.ok(new SpeakerDetailsDTO(speaker));
     }
 
-    @DeleteMapping("/:id")
+    @DeleteMapping("/{speaker_id}")
     @Transactional
     @Operation(summary = "Deletar um palestrante", description = "Deleta um palestrante pelo id.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Palestrante deletado com sucesso.", content = @Content(schema = @Schema(implementation = Object.class), mediaType = "application/json")),
-            @ApiResponse(responseCode = "401", description = "Usuário não autenticado.", content = @Content(schema = @Schema(hidden = true)))
+            @ApiResponse(responseCode = "200", description = "Palestrante deletado com sucesso.", content = @Content(schema = @Schema(hidden = true), mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Usuário não autenticado.", content = @Content(schema = @Schema(hidden = true))),
+            @ApiResponse(responseCode = "404", description = "Palestrante não encontrado.", content = @Content(schema = @Schema(implementation = ErrorDTO.class), mediaType = "application/json"))
     })
-    public ResponseEntity<Void> deleteSpeaker(
-            @PathVariable("id") Long speakerId
+    public ResponseEntity<Object> deleteSpeaker(
+            @PathVariable("speaker_id") Long speakerId
     ) {
-        speakerRepository.deleteById(speakerId);
-        return ResponseEntity.ok().build();
+        try {
+            speakerRepository.deleteById(speakerId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDTO("Bad Request", "Palestrante não encontrado.", LocalDateTime.now()));
+        }
     }
 }
