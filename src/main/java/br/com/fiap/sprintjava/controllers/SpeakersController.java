@@ -2,8 +2,10 @@ package br.com.fiap.sprintjava.controllers;
 
 import br.com.fiap.sprintjava.dtos.errors.ErrorDTO;
 import br.com.fiap.sprintjava.dtos.errors.ValidationErrorDTO;
+import br.com.fiap.sprintjava.dtos.event.EventDetailsDTO;
 import br.com.fiap.sprintjava.dtos.speaker.SpeakerDetailsDTO;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -38,7 +40,7 @@ public class SpeakersController {
     @GetMapping
     @Operation(summary = "Obter todos os palestrantes", description = "Obtém todos os palestrantes do evento pelo id.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Palestrantes obtidos com sucesso.", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "200", description = "Palestrantes obtidos com sucesso.", content = @Content(array = @ArraySchema(schema = @Schema(implementation = SpeakerDetailsDTO.class)), mediaType = "application/json")),
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado.", content = @Content(schema = @Schema(hidden = true)))
     })
     public ResponseEntity<List<SpeakerDetailsDTO>> getSpeakers(

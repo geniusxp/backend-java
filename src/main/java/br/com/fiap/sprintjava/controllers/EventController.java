@@ -3,18 +3,15 @@ package br.com.fiap.sprintjava.controllers;
 import br.com.fiap.sprintjava.dtos.event.CreateEventDTO;
 import br.com.fiap.sprintjava.dtos.event.EventDetailsDTO;
 import br.com.fiap.sprintjava.dtos.event.UpdateEventDTO;
-import br.com.fiap.sprintjava.dtos.eventday.CreateEventDayDTO;
-import br.com.fiap.sprintjava.dtos.eventday.EventDayDetailsDTO;
 import br.com.fiap.sprintjava.dtos.tickettype.CreateTicketTypeDTO;
 import br.com.fiap.sprintjava.dtos.tickettype.TicketTypeDetailsDTO;
 import br.com.fiap.sprintjava.models.Event;
-import br.com.fiap.sprintjava.models.EventDay;
 import br.com.fiap.sprintjava.models.TicketType;
-import br.com.fiap.sprintjava.repositories.EventDayRepository;
 import br.com.fiap.sprintjava.repositories.EventRepository;
 import br.com.fiap.sprintjava.dtos.errors.ValidationErrorDTO;
 import br.com.fiap.sprintjava.repositories.TicketTypeRepository;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -23,7 +20,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -45,7 +41,7 @@ public class EventController {
     @GetMapping
     @Operation(summary = "Obter todos os eventos", description = "Obtém todos os eventos cadastrados.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Eventos obtidos com sucesso.", content = @Content(schema = @Schema(implementation = EventDetailsDTO.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "200", description = "Eventos obtidos com sucesso.", content = @Content(array = @ArraySchema(schema = @Schema(implementation = EventDetailsDTO.class)), mediaType = "application/json")),
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado.", content = @Content(schema = @Schema(hidden = true)))
     })
     public ResponseEntity<List<EventDetailsDTO>> getEvents() {

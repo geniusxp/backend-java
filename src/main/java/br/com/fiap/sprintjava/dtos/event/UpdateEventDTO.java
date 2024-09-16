@@ -3,9 +3,6 @@ package br.com.fiap.sprintjava.dtos.event;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record UpdateEventDTO(
-        @Schema(description = "Id do evento", example = "1")
-        Long id,
-
         @Schema(description = "Nome do evento", example = "FIAP Next 2024")
         String name,
 

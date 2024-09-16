@@ -8,8 +8,8 @@ import br.com.fiap.sprintjava.dtos.eventday.EventDayPreviewDTO;
 import br.com.fiap.sprintjava.models.EventDay;
 import br.com.fiap.sprintjava.repositories.EventDayRepository;
 import br.com.fiap.sprintjava.repositories.EventRepository;
-import br.com.fiap.sprintjava.repositories.TicketTypeRepository;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -81,7 +81,7 @@ public class EventDayController {
     @GetMapping("/events/{event_id}/days")
     @Operation(summary = "Obter todos os dias de evento", description = "Obtém todos os dias de evento pelo id do evento.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Dias de evento obtidos com sucesso.", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "200", description = "Dias de evento obtidos com sucesso.", content = @Content(array = @ArraySchema(schema = @Schema(implementation = EventDayPreviewDTO.class)), mediaType = "application/json")),
             @ApiResponse(responseCode = "404", description = "Evento não encontrado.", content = @Content(schema = @Schema(hidden = true)))
     })
     public ResponseEntity<List<EventDayPreviewDTO>> getEventDays(

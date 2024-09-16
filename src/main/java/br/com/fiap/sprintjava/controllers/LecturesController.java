@@ -4,6 +4,7 @@ import br.com.fiap.sprintjava.dtos.errors.ErrorDTO;
 import br.com.fiap.sprintjava.dtos.errors.ValidationErrorDTO;
 import br.com.fiap.sprintjava.dtos.lecture.LectureDetailsDTO;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -18,8 +19,6 @@ import br.com.fiap.sprintjava.repositories.SpeakerRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +43,7 @@ public class LecturesController {
     @GetMapping("/event-days/{event_day_id}/lectures")
     @Operation(summary = "Obter todas as palestras de um dia", description = "Obtém todas as palestras do dia do evento pelo id do dia.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Palestras obtidas com sucesso.", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "200", description = "Palestras obtidas com sucesso.", content = @Content(array = @ArraySchema(schema = @Schema(implementation = LectureDetailsDTO.class)), mediaType = "application/json")),
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado.", content = @Content(schema = @Schema(hidden = true)))
     })
     public ResponseEntity<List<LectureDetailsDTO>> getLectures(

@@ -2,7 +2,6 @@ package br.com.fiap.sprintjava.controllers;
 
 import br.com.fiap.sprintjava.dtos.errors.ErrorDTO;
 import br.com.fiap.sprintjava.dtos.errors.ValidationErrorDTO;
-import br.com.fiap.sprintjava.models.Lecture;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
